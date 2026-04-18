@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
-from models import MovementType
+from models import MovementType, PurchaseOrderStatus
 
 class UserCreate(BaseModel):
     username: str
@@ -87,5 +87,44 @@ class StockMovementOut(BaseModel):
     quantity: int
     notes: Optional[str]
     created_at: datetime
+    class Config:
+        from_attributes = True
+
+class PurchaseOrderItemCreate(BaseModel):
+    product_id: int
+    quantity: int
+    unit_price: float
+
+class PurchaseOrderItemOut(BaseModel):
+    id: int
+    purchase_order_id: int
+    product_id: int
+    quantity: int
+    unit_price: float
+    class Config:
+        from_attributes = True
+
+class PurchaseOrderCreate(BaseModel):
+    supplier_id: int
+    expected_delivery_date: Optional[datetime] = None
+    notes: Optional[str] = None
+    items: List[PurchaseOrderItemCreate]
+
+class PurchaseOrderUpdate(BaseModel):
+    expected_delivery_date: Optional[datetime] = None
+    notes: Optional[str] = None
+    status: Optional[PurchaseOrderStatus] = None
+
+class PurchaseOrderOut(BaseModel):
+    id: int
+    supplier_id: int
+    status: PurchaseOrderStatus
+    order_date: datetime
+    expected_delivery_date: Optional[datetime]
+    notes: Optional[str]
+    created_by: Optional[int]
+    created_at: datetime
+    received_at: Optional[datetime]
+    items: List[PurchaseOrderItemOut] = []
     class Config:
         from_attributes = True
