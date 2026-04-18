@@ -22,8 +22,6 @@ def create_purchase_order(po: schemas.PurchaseOrderCreate, db: Session = Depends
         product = db.query(models.Product).filter(models.Product.id == item.product_id).first()
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
-        if product.supplier_id != po.supplier_id:
-            raise HTTPException(status_code=400, detail="Product does not belong to supplier")
         db_po.items.append(models.PurchaseOrderItem(
             product_id=item.product_id,
             quantity=item.quantity,
