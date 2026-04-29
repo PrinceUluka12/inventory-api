@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import engine, Base
-from routers import auth, categories, suppliers, products, stock
+from routers import auth, categories, suppliers, products, stock, purchase_orders
 
 Base.metadata.create_all(bind=engine)
 
@@ -11,3 +11,4 @@ app.include_router(categories.router)
 app.include_router(suppliers.router)
 app.include_router(products.router)
 app.include_router(stock.router)
+app.include_router(purchase_orders.router)

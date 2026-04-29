@@ -9,6 +9,12 @@ class MovementType(str, enum.Enum):
     OUT = "OUT"
     ADJUSTMENT = "ADJUSTMENT"
 
+class POStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    SUBMITTED = "SUBMITTED"
+    RECEIVED = "RECEIVED"
+    CANCELLED = "CANCELLED"
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -57,3 +63,27 @@ class StockMovement(Base):
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     product = relationship("Product", back_populates="stock_movements")
+
+class PurchaseOrder(Base):
+    __tablename__ = "purchase_orders"
+    id = Column(Integer, primary_key=True, index=True)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"))
+    status = Column(Enum(POStatus), default=POStatus.DRAFT)
+    order_date = Column(DateTime, default=datetime.utcnow)
+    expected_date = Column(DateTime, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(Integer, ForeignKey("users.id"))
+    supplier = relationship("Supplier")
+    creator = relationship("User")
+    items = relationship("PurchaseOrderItem", back_populates="purchase_order", cascade="all, delete-orphan")
+
+class PurchaseOrderItem(Base):
+    __tablename__ = "purchase_order_items"
+    id = Column(Integer, primary_key=True, index=True)
+    po_id = Column(Integer, ForeignKey("purchase_orders.id"))
+    product_id = Column(Integer, ForeignKey("products.id"))
+    quantity_ordered = Column(Integer)
+    unit_price = Column(Float)
+    purchase_order = relationship("PurchaseOrder", back_populates="items")
+    product = relationship("Product")
